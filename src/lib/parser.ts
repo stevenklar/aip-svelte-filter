@@ -22,7 +22,6 @@ export function parse(input: string): ParseResult {
 }
 
 export function prettyPrintAst(node: any, indent = 0): string {
-  // eslint-disable-line @typescript-eslint/no-explicit-any
   if (node == null) return "";
   const pad = "  ".repeat(indent);
   if (typeof node !== "object") return pad + String(node);
@@ -49,11 +48,9 @@ export function prettyPrintAst(node: any, indent = 0): string {
 }
 
 export function summarizeGrammar(ast: any): string {
-  // eslint-disable-line @typescript-eslint/no-explicit-any
   if (!ast) return "No filter applied";
 
   function describe(node: any): string {
-    // eslint-disable-line @typescript-eslint/no-explicit-any
     if (!node) return "";
 
     // Handle primitive values
@@ -98,7 +95,6 @@ export function summarizeGrammar(ast: any): string {
   }
 
   function formatFieldName(field: any): string {
-    // eslint-disable-line @typescript-eslint/no-explicit-any
     if (typeof field === "string") {
       // Convert snake_case or camelCase to human readable
       return field
@@ -122,7 +118,6 @@ export function summarizeGrammar(ast: any): string {
   }
 
   function formatValue(value: any): string {
-    // eslint-disable-line @typescript-eslint/no-explicit-any
     if (value === null) return "null";
     if (value === undefined) return "undefined";
     if (typeof value === "string") {
@@ -139,7 +134,6 @@ export function summarizeGrammar(ast: any): string {
   }
 
   function handleAndOperator(node: any): string {
-    // eslint-disable-line @typescript-eslint/no-explicit-any
     const left = describe(node.left);
     const right = describe(node.right);
 
@@ -148,7 +142,6 @@ export function summarizeGrammar(ast: any): string {
   }
 
   function handleOrOperator(node: any): string {
-    // eslint-disable-line @typescript-eslint/no-explicit-any
     const left = describe(node.left);
     const right = describe(node.right);
 
@@ -157,7 +150,6 @@ export function summarizeGrammar(ast: any): string {
   }
 
   function handleNotOperator(node: any): string {
-    // eslint-disable-line @typescript-eslint/no-explicit-any
     const child = describe(node.expr);
 
     if (!child) {
@@ -176,7 +168,6 @@ export function summarizeGrammar(ast: any): string {
   }
 
   function handleUnknownNode(node: any): string {
-    // eslint-disable-line @typescript-eslint/no-explicit-any
     // Try to extract meaningful information from unknown nodes
     if (node.value !== undefined && typeof node.value !== "object") {
       return formatValue(node.value);

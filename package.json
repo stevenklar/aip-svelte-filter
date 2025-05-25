@@ -36,7 +36,8 @@
     "prepublishOnly": "npm run build",
     "check": "svelte-check --tsconfig ./tsconfig.json",
     "lint": "prettier --check . && eslint .",
-    "format": "prettier --write ."
+    "format": "prettier --write .",
+    "format-eslint": "eslint --fix ."
   },
   "keywords": [
     "google-api",
