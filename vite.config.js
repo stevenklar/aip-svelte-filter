@@ -2,7 +2,14 @@ import { defineConfig } from "vite";
 import { svelte } from "@sveltejs/vite-plugin-svelte";
 
 export default defineConfig({
-  plugins: [svelte()],
+  plugins: [
+    svelte({
+      // Ensure Svelte dependencies are properly externalized
+      compilerOptions: {
+        css: "external",
+      },
+    }),
+  ],
   build: {
     lib: {
       entry: "src/lib/index.ts",
@@ -10,10 +17,13 @@ export default defineConfig({
       fileName: "index",
     },
     rollupOptions: {
-      external: ["svelte"],
+      // Externalize Svelte-related packages to prevent bundling
+      external: ["svelte", "svelte/store", "svelte/internal"],
       output: {
         globals: {
           svelte: "Svelte",
+          "svelte/store": "SvelteStore",
+          "svelte/internal": "SvelteInternal",
         },
       },
     },

@@ -8,6 +8,7 @@ A headless Svelte utility and parser for [Google API filter expressions](https:/
 - Returns AST, error, and validity
 - Pretty-prints AST
 - Headless Svelte component for easy integration
+- **SSR Compatible** - Works with SvelteKit and other SSR frameworks
 
 ## Usage (JS/TS)
 
@@ -52,6 +53,33 @@ if (result.isSuccess) {
 ### `<FilterParser filter={string} let:ast let:isValid let:error let:prettyAst let:summary />`
 
 - Svelte headless component. All values are reactive.
+
+## SSR Compatibility
+
+This package is fully compatible with server-side rendering (SSR) environments like SvelteKit. The parser functions work in both Node.js and browser environments, and the FilterParser component is designed to be SSR-safe.
+
+### SvelteKit Usage
+
+```svelte
+<script lang="ts">
+  import { parse } from 'aip-svelte-filter';
+  import FilterParser from 'aip-svelte-filter/FilterParser.svelte';
+
+  let filter = 'name = "example"';
+
+  // This works in both SSR and client-side
+  const result = parse(filter);
+</script>
+
+<!-- This component is SSR-safe -->
+<FilterParser {filter} let:ast let:isValid let:error>
+  {#if isValid}
+    <p>Filter is valid!</p>
+  {:else}
+    <p>Error: {error}</p>
+  {/if}
+</FilterParser>
+```
 
 ## Development
 

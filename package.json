@@ -1,6 +1,6 @@
 {
   "name": "aip-svelte-filter",
-  "version": "1.0.1",
+  "version": "1.0.2",
   "description": "A headless Svelte utility and parser for Google API filter expressions (AIP-160), using a Peggy grammar",
   "type": "module",
   "main": "dist/index.js",
@@ -16,14 +16,15 @@
     },
     "./FilterParser.svelte": {
       "types": "./dist/FilterParser.svelte.d.ts",
-      "svelte": "./dist/FilterParser.svelte",
-      "default": "./dist/FilterParser.svelte"
+      "svelte": "./src/lib/FilterParser.svelte",
+      "default": "./src/lib/FilterParser.svelte"
     }
   },
   "files": [
     "dist",
     "!dist/**/*.test.*",
-    "!dist/**/*.spec.*"
+    "!dist/**/*.spec.*",
+    "src/lib/FilterParser.svelte"
   ],
   "scripts": {
     "build": "npm run build:grammar && vite build && tsc --emitDeclarationOnly",
