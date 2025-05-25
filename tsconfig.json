@@ -15,9 +15,18 @@
     "forceConsistentCasingInFileNames": true,
     "declaration": true,
     "declarationMap": true,
-    "outDir": "./dist"
+    "outDir": "./dist",
+    "baseUrl": ".",
+    "paths": {
+      "aip-svelte-filter": [
+        "./src/lib/index.ts"
+      ]
+    }
   },
-  "include": ["src/**/*.ts", "src/**/*.svelte"],
+  "include": [
+    "src/**/*.ts",
+    "src/**/*.svelte"
+  ],
   "exclude": [
     "dist",
     "node_modules",
