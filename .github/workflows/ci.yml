@@ -42,12 +42,21 @@ jobs:
       - name: Run tests with coverage
         run: npm run test:coverage
 
-      - name: Upload coverage reports
+      - name: Upload coverage reports to Codecov
         if: matrix.node-version == 20
         uses: codecov/codecov-action@v4
         with:
           file: ./coverage/lcov.info
           fail_ci_if_error: false
+          token: ${{ secrets.CODECOV_TOKEN }}
+
+      - name: Coverage comment
+        if: matrix.node-version == 20 && github.event_name == 'pull_request'
+        uses: romeovs/lcov-reporter-action@v0.3.1
+        with:
+          github-token: ${{ secrets.GITHUB_TOKEN }}
+          lcov-file: ./coverage/lcov.info
+          delete-old-comments: true
 
   build:
     runs-on: ubuntu-latest
