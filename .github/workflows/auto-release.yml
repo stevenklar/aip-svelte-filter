@@ -1,17 +1,16 @@
 name: Auto Release
 
 on:
-  push:
+  workflow_run:
+    workflows: ["CI"]
+    types:
+      - completed
     branches: [main]
-    paths-ignore:
-      - '**.md'
-      - '.github/**'
-      - '.gitignore'
-      - '.prettierignore'
 
 jobs:
   release:
     runs-on: ubuntu-latest
+    if: ${{ github.event.workflow_run.conclusion == 'success' }}
     
     permissions:
       contents: write
@@ -29,7 +28,7 @@ jobs:
       - name: Check if version bump commit
         id: check-commit
         run: |
-          if [[ "${{ github.event.head_commit.message }}" == *"chore: bump version"* ]]; then
+          if [[ "${{ github.event.workflow_run.head_commit.message }}" == *"chore: bump version"* ]]; then
             echo "skip=true" >> $GITHUB_OUTPUT
             echo "This is a version bump commit, skipping release"
           else
@@ -47,18 +46,6 @@ jobs:
       - name: Install dependencies
         if: steps.check-commit.outputs.skip == 'false'
         run: npm ci
-
-      - name: Build grammar
-        if: steps.check-commit.outputs.skip == 'false'
-        run: npm run build:grammar
-
-      - name: Run tests
-        if: steps.check-commit.outputs.skip == 'false'
-        run: npm run test
-
-      - name: Build package
-        if: steps.check-commit.outputs.skip == 'false'
-        run: npm run build
 
       - name: Configure Git
         if: steps.check-commit.outputs.skip == 'false'
