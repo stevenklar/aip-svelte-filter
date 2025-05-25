@@ -1,0 +1,159 @@
+name: Auto Release
+
+on:
+  push:
+    branches: [main]
+    paths-ignore:
+      - '**.md'
+      - '.github/**'
+      - '.gitignore'
+      - '.prettierignore'
+
+jobs:
+  release:
+    runs-on: ubuntu-latest
+    
+    permissions:
+      contents: write
+      issues: write
+      pull-requests: write
+      id-token: write
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+          token: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Check if version bump commit
+        id: check-commit
+        run: |
+          if [[ "${{ github.event.head_commit.message }}" == *"chore: bump version"* ]]; then
+            echo "skip=true" >> $GITHUB_OUTPUT
+            echo "This is a version bump commit, skipping release"
+          else
+            echo "skip=false" >> $GITHUB_OUTPUT
+            echo "Not a version bump commit, proceeding with release"
+          fi
+
+      - name: Setup Node.js
+        if: steps.check-commit.outputs.skip == 'false'
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: "npm"
+
+      - name: Install dependencies
+        if: steps.check-commit.outputs.skip == 'false'
+        run: npm ci
+
+      - name: Build grammar
+        if: steps.check-commit.outputs.skip == 'false'
+        run: npm run build:grammar
+
+      - name: Run tests
+        if: steps.check-commit.outputs.skip == 'false'
+        run: npm run test
+
+      - name: Build package
+        if: steps.check-commit.outputs.skip == 'false'
+        run: npm run build
+
+      - name: Configure Git
+        if: steps.check-commit.outputs.skip == 'false'
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+
+      - name: Determine version bump
+        if: steps.check-commit.outputs.skip == 'false'
+        id: version-bump
+        run: |
+          # Get commits since last tag
+          LAST_TAG=$(git describe --tags --abbrev=0 2>/dev/null || echo "")
+          if [ -z "$LAST_TAG" ]; then
+            COMMITS=$(git log --oneline)
+          else
+            COMMITS=$(git log ${LAST_TAG}..HEAD --oneline)
+          fi
+          
+          echo "Recent commits:"
+          echo "$COMMITS"
+          
+          # Determine bump type based on commit messages
+          if echo "$COMMITS" | grep -qiE "(BREAKING CHANGE|breaking:|\!:)"; then
+            echo "BUMP_TYPE=major" >> $GITHUB_OUTPUT
+            echo "Detected: MAJOR version bump (breaking changes)"
+          elif echo "$COMMITS" | grep -qiE "(feat:|feature:)"; then
+            echo "BUMP_TYPE=minor" >> $GITHUB_OUTPUT
+            echo "Detected: MINOR version bump (new features)"
+          else
+            echo "BUMP_TYPE=patch" >> $GITHUB_OUTPUT
+            echo "Detected: PATCH version bump (fixes/improvements)"
+          fi
+
+      - name: Bump version
+        if: steps.check-commit.outputs.skip == 'false'
+        id: bump
+        run: |
+          BUMP_TYPE="${{ steps.version-bump.outputs.BUMP_TYPE }}"
+          echo "Bumping $BUMP_TYPE version..."
+          
+          NEW_VERSION=$(npm version $BUMP_TYPE --no-git-tag-version)
+          echo "NEW_VERSION=$NEW_VERSION" >> $GITHUB_OUTPUT
+          echo "New version: $NEW_VERSION"
+
+      - name: Generate changelog
+        if: steps.check-commit.outputs.skip == 'false'
+        id: changelog
+        run: |
+          NEW_VERSION="${{ steps.bump.outputs.NEW_VERSION }}"
+          
+          # Get commits since last tag for changelog
+          LAST_TAG=$(git describe --tags --abbrev=0 2>/dev/null || echo "")
+          if [ -z "$LAST_TAG" ]; then
+            COMMITS=$(git log --oneline --pretty=format:"- %s (%h)")
+          else
+            COMMITS=$(git log ${LAST_TAG}..HEAD --oneline --pretty=format:"- %s (%h)")
+          fi
+          
+          # Create changelog content
+          {
+            echo "CHANGELOG<<EOF"
+            echo "## What's Changed"
+            echo ""
+            echo "$COMMITS"
+            echo ""
+            echo "**Full Changelog**: https://github.com/${{ github.repository }}/compare/${LAST_TAG}...${NEW_VERSION}"
+            echo "EOF"
+          } >> $GITHUB_OUTPUT
+
+      - name: Commit version bump
+        if: steps.check-commit.outputs.skip == 'false'
+        run: |
+          NEW_VERSION="${{ steps.bump.outputs.NEW_VERSION }}"
+          git add package.json package-lock.json
+          git commit -m "chore: bump version to $NEW_VERSION"
+          git push origin main
+          git tag "$NEW_VERSION"
+          git push origin "$NEW_VERSION"
+
+      - name: Create GitHub Release
+        if: steps.check-commit.outputs.skip == 'false'
+        uses: actions/github-script@v7
+        with:
+          script: |
+            const { owner, repo } = context.repo;
+            const tagName = "${{ steps.bump.outputs.NEW_VERSION }}";
+            const changelog = `${{ steps.changelog.outputs.CHANGELOG }}`;
+            
+            await github.rest.repos.createRelease({
+              owner,
+              repo,
+              tag_name: tagName,
+              name: `Release ${tagName}`,
+              body: changelog,
+              draft: false,
+              prerelease: false
+            }); 
