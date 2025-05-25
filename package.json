@@ -32,8 +32,8 @@
   ],
   "scripts": {
     "build": "npm run build:grammar && vite build && tsc --emitDeclarationOnly",
-    "build:grammar": "peggy -o filter-peg.js src/lib/filter-peg.grammar",
-    "dev": "peggy -w -o filter-peg.js src/lib/filter-peg.grammar",
+    "build:grammar": "peggy --format es -o filter-peg.js src/lib/filter-peg.grammar",
+    "dev": "peggy --format es -w -o filter-peg.js src/lib/filter-peg.grammar",
     "test": "npm run build:grammar && vitest run",
     "test:watch": "npm run build:grammar && vitest",
     "test:coverage": "npm run build:grammar && vitest run --coverage",
