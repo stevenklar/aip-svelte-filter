@@ -10,7 +10,7 @@ jobs:
   test:
     runs-on: ubuntu-latest
     permissions:
-      contents: read
+      contents: write
       pull-requests: write
       checks: write
 
@@ -21,6 +21,10 @@ jobs:
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
+        with:
+          token: ${{ secrets.GITHUB_TOKEN }}
+          fetch-depth: 0
+          ref: ${{ github.head_ref || github.ref }}
 
       - name: Setup Node.js ${{ matrix.node-version }}
         uses: actions/setup-node@v4
@@ -33,6 +37,44 @@ jobs:
 
       - name: Build grammar
         run: npm run build:grammar
+
+      - name: Auto-format code (PR only)
+        if: github.event_name == 'pull_request' && matrix.node-version == 20
+        run: |
+          # Run formatter
+          npm run format
+          
+          # Run ESLint autofix
+          npm run format-eslint
+          
+          # Check for changes
+          if [ -n "$(git status --porcelain)" ]; then
+            echo "📝 Found formatting changes - committing fixes"
+            git config --local user.email "action@github.com"
+            git config --local user.name "GitHub Action"
+            git add .
+            git commit -m "style: auto-format code with prettier and eslint
+
+            Co-authored-by: ${{ github.actor }} <${{ github.actor }}@users.noreply.github.com>"
+            git push origin HEAD:${{ github.head_ref }}
+            echo "✅ Code auto-formatted and committed"
+            echo "AUTOFIX_APPLIED=true" >> $GITHUB_ENV
+          else
+            echo "✅ No formatting changes needed"
+            echo "AUTOFIX_APPLIED=false" >> $GITHUB_ENV
+          fi
+
+      - name: Comment on auto-format (PR only)
+        if: github.event_name == 'pull_request' && matrix.node-version == 20 && env.AUTOFIX_APPLIED == 'true'
+        uses: actions/github-script@v7
+        with:
+          script: |
+            github.rest.issues.createComment({
+              issue_number: context.issue.number,
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              body: '🤖 **Auto-formatted your code!**\n\nI found some formatting issues and fixed them automatically. The latest commit includes these formatting changes:\n\n- ✨ Prettier formatting\n- 🔧 ESLint auto-fixes\n\nYour tests will continue running on the formatted code! 🎉'
+            })
 
       - name: Type check
         run: npm run check
