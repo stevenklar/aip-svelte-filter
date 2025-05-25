@@ -55,7 +55,7 @@ jobs:
           token: ${{ secrets.CODECOV_TOKEN }}
 
       - name: Coverage comment
-        if: matrix.node-version == 20 && github.event_name == 'pull_request'
+        if: github.event_name == 'pull_request'
         uses: MishaKav/jest-coverage-comment@main
         with:
           coverage-summary-path: ./coverage/coverage-summary.json
