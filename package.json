@@ -1,85 +1,85 @@
 {
-    "name": "aip-svelte-filter",
-    "version": "1.0.1",
-    "description": "A headless Svelte utility and parser for Google API filter expressions (AIP-160), using a Peggy grammar",
-    "type": "module",
-    "main": "dist/index.js",
-    "module": "dist/index.js",
-    "types": "dist/index.d.ts",
-    "svelte": "dist/index.js",
-    "exports": {
-        ".": {
-            "types": "./dist/index.d.ts",
-            "svelte": "./dist/index.js",
-            "import": "./dist/index.js",
-            "default": "./dist/index.js"
-        },
-        "./FilterParser.svelte": {
-            "types": "./dist/FilterParser.svelte.d.ts",
-            "svelte": "./dist/FilterParser.svelte",
-            "default": "./dist/FilterParser.svelte"
-        }
+  "name": "aip-svelte-filter",
+  "version": "1.0.1",
+  "description": "A headless Svelte utility and parser for Google API filter expressions (AIP-160), using a Peggy grammar",
+  "type": "module",
+  "main": "dist/index.js",
+  "module": "dist/index.js",
+  "types": "dist/index.d.ts",
+  "svelte": "dist/index.js",
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.ts",
+      "svelte": "./dist/index.js",
+      "import": "./dist/index.js",
+      "default": "./dist/index.js"
     },
-    "files": [
-        "dist",
-        "!dist/**/*.test.*",
-        "!dist/**/*.spec.*"
-    ],
-    "scripts": {
-        "build": "npm run build:grammar && vite build && tsc --emitDeclarationOnly",
-        "build:grammar": "peggy --format es -o filter-peg.js src/lib/filter-peg.grammar",
-        "dev": "peggy --format es -w -o filter-peg.js src/lib/filter-peg.grammar",
-        "test": "npm run build:grammar && vitest run",
-        "test:watch": "npm run build:grammar && vitest",
-        "test:coverage": "npm run build:grammar && vitest run --coverage",
-        "prepublishOnly": "npm run build",
-        "check": "svelte-check --tsconfig ./tsconfig.json",
-        "lint": "prettier --check . && eslint .",
-        "format": "prettier --write ."
-    },
-    "keywords": [
-        "google-api",
-        "aip-160",
-        "filter",
-        "parser",
-        "svelte",
-        "peggy",
-        "ast",
-        "headless"
-    ],
-    "author": "Steven Klar <@stevenklar>",
-    "license": "MIT",
-    "devDependencies": {
-        "@eslint/js": "^9.0.0",
-        "@sveltejs/vite-plugin-svelte": "^4.0.0",
-        "@types/eslint": "^9.6.0",
-        "@typescript-eslint/eslint-plugin": "^8.0.0",
-        "@typescript-eslint/parser": "^8.0.0",
-        "@vitest/coverage-v8": "^2.0.0",
-        "eslint": "^9.0.0",
-        "eslint-config-prettier": "^9.1.0",
-        "eslint-plugin-svelte": "^2.36.0",
-        "globals": "^15.0.0",
-        "peggy": "^4.0.0",
-        "prettier": "^3.1.0",
-        "prettier-plugin-svelte": "^3.1.0",
-        "svelte": "^5.0.0",
-        "svelte-check": "^4.0.0",
-        "svelte-eslint-parser": "^0.41.0",
-        "typescript": "^5.0.0",
-        "typescript-eslint": "^8.0.0",
-        "vite": "^5.0.0",
-        "vitest": "^2.0.0"
-    },
-    "peerDependencies": {
-        "svelte": "^4.0.0 || ^5.0.0"
-    },
-    "repository": {
-        "type": "git",
-        "url": "https://github.com/stevenklar/aip-svelte-filter"
-    },
-    "bugs": {
-        "url": "https://github.com/stevenklar/aip-svelte-filter/issues"
-    },
-    "homepage": "https://github.com/stevenklar/aip-svelte-filter"
+    "./FilterParser.svelte": {
+      "types": "./dist/FilterParser.svelte.d.ts",
+      "svelte": "./dist/FilterParser.svelte",
+      "default": "./dist/FilterParser.svelte"
+    }
+  },
+  "files": [
+    "dist",
+    "!dist/**/*.test.*",
+    "!dist/**/*.spec.*"
+  ],
+  "scripts": {
+    "build": "npm run build:grammar && vite build && tsc --emitDeclarationOnly",
+    "build:grammar": "peggy --format es -o filter-peg.js src/lib/filter-peg.grammar",
+    "dev": "peggy --format es -w -o filter-peg.js src/lib/filter-peg.grammar",
+    "test": "npm run build:grammar && vitest run",
+    "test:watch": "npm run build:grammar && vitest",
+    "test:coverage": "npm run build:grammar && vitest run --coverage",
+    "prepublishOnly": "npm run build",
+    "check": "svelte-check --tsconfig ./tsconfig.json",
+    "lint": "prettier --check . && eslint .",
+    "format": "prettier --write ."
+  },
+  "keywords": [
+    "google-api",
+    "aip-160",
+    "filter",
+    "parser",
+    "svelte",
+    "peggy",
+    "ast",
+    "headless"
+  ],
+  "author": "Steven Klar <@stevenklar>",
+  "license": "MIT",
+  "devDependencies": {
+    "@eslint/js": "^9.0.0",
+    "@sveltejs/vite-plugin-svelte": "^4.0.0",
+    "@types/eslint": "^9.6.0",
+    "@typescript-eslint/eslint-plugin": "^8.0.0",
+    "@typescript-eslint/parser": "^8.0.0",
+    "@vitest/coverage-v8": "^2.0.0",
+    "eslint": "^9.0.0",
+    "eslint-config-prettier": "^9.1.0",
+    "eslint-plugin-svelte": "^2.36.0",
+    "globals": "^15.0.0",
+    "peggy": "^4.0.0",
+    "prettier": "^3.1.0",
+    "prettier-plugin-svelte": "^3.1.0",
+    "svelte": "^5.0.0",
+    "svelte-check": "^4.0.0",
+    "svelte-eslint-parser": "^0.41.0",
+    "typescript": "^5.0.0",
+    "typescript-eslint": "^8.0.0",
+    "vite": "^5.0.0",
+    "vitest": "^2.0.0"
+  },
+  "peerDependencies": {
+    "svelte": "^4.0.0 || ^5.0.0"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/stevenklar/aip-svelte-filter"
+  },
+  "bugs": {
+    "url": "https://github.com/stevenklar/aip-svelte-filter/issues"
+  },
+  "homepage": "https://github.com/stevenklar/aip-svelte-filter"
 }
