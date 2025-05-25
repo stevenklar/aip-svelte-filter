@@ -9,6 +9,10 @@ on:
 jobs:
   test:
     runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      pull-requests: write
+      checks: write
 
     strategy:
       matrix:
@@ -52,11 +56,52 @@ jobs:
 
       - name: Coverage comment
         if: matrix.node-version == 20 && github.event_name == 'pull_request'
-        uses: romeovs/lcov-reporter-action@v0.3.1
+        uses: MishaKav/jest-coverage-comment@main
         with:
-          github-token: ${{ secrets.GITHUB_TOKEN }}
-          lcov-file: ./coverage/lcov.info
-          delete-old-comments: true
+          coverage-summary-path: ./coverage/coverage-summary.json
+          title: Coverage Report
+          summary-title: Coverage Summary
+          badge-title: Coverage
+          hide-comment: false
+          create-new-comment: false
+          hide-summary: false
+          junitxml-title: Coverage
+          coverage-path-prefix: ./coverage/
+          
+      - name: Coverage check
+        if: matrix.node-version == 20
+        run: |
+          echo "📊 Coverage Report" >> $GITHUB_STEP_SUMMARY
+          echo "=================" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          
+          # Extract coverage percentage from json-summary
+          if [ -f "./coverage/coverage-summary.json" ]; then
+            COVERAGE=$(node -p "
+              const summary = require('./coverage/coverage-summary.json');
+              const pct = summary.total.lines.pct;
+              console.log(\`📈 **Line Coverage: \${pct}%**\`);
+              
+              // Add file breakdown
+              console.log('');
+              console.log('| File | Lines | Functions | Branches | Statements |');
+              console.log('|------|-------|-----------|----------|------------|');
+              
+              Object.entries(summary).forEach(([file, data]) => {
+                if (file !== 'total' && data.lines) {
+                  const fileName = file.replace(process.cwd() + '/', '');
+                  console.log(\`| \${fileName} | \${data.lines.pct}% | \${data.functions.pct}% | \${data.branches.pct}% | \${data.statements.pct}% |\`);
+                }
+              });
+              
+              console.log('');
+              console.log(\`**Total Coverage: \${pct}%**\`);
+              pct;
+            ")
+            echo "$COVERAGE" >> $GITHUB_STEP_SUMMARY
+          else
+            echo "❌ Coverage summary not found" >> $GITHUB_STEP_SUMMARY
+          fi
 
   build:
     runs-on: ubuntu-latest

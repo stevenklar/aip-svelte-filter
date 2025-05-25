@@ -31,7 +31,7 @@ export default defineConfig({
   test: {
     globals: true,
     coverage: {
-      reporter: ["text", "json", "html", "lcov"],
+      reporter: ["text", "json", "json-summary", "html", "lcov", "cobertura"],
       exclude: [
         "node_modules/",
         "dist/",
