@@ -1,0 +1,6 @@
+ignore:
+  - 'filter-peg.js'
+  - 'eslint.config.js'
+  - 'svelte.config.js'
+  - 'vitest.config.ts'
+  - 'src/lib/FilterParser.svelte'
