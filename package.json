@@ -14,11 +14,6 @@
       "import": "./dist/index.js",
       "default": "./dist/index.js"
     },
-    "./parser": {
-      "types": "./dist/parser.d.ts",
-      "import": "./dist/parser.js",
-      "default": "./dist/parser.js"
-    },
     "./FilterParser.svelte": {
       "types": "./dist/FilterParser.svelte.d.ts",
       "svelte": "./dist/FilterParser.svelte",

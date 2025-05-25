@@ -74,8 +74,6 @@ jobs:
           ls -la dist/
           test -f dist/index.js
           test -f dist/index.d.ts
-          test -f dist/parser.js
-          test -f dist/parser.d.ts
 
   publish-dry-run:
     runs-on: ubuntu-latest
