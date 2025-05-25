@@ -206,6 +206,40 @@ describe("prettyPrintAst", () => {
       expect(typeof formatted).toBe("string");
     }
   });
+
+  it("should handle nodes with object values", () => {
+    const ast = {
+      type: "custom",
+      field: "metadata",
+      value: {
+        nested: "data",
+        count: 42,
+      },
+    };
+    const result = prettyPrintAst(ast);
+    expect(result).toContain("custom (metadata)");
+    expect(result).toContain("data");
+    expect(result).toContain("42");
+    // The object value should be processed recursively
+    expect(result.length).toBeGreaterThan("custom (metadata)\n".length);
+  });
+
+  it("should handle nodes with additional properties", () => {
+    const ast = {
+      type: "test",
+      field: "name",
+      customProp: "value",
+      anotherProp: {
+        nested: true,
+      },
+    };
+    const result = prettyPrintAst(ast);
+    expect(result).toContain("test (name)");
+    expect(result).toContain("value");
+    expect(result).toContain("true");
+    // Should process additional properties recursively
+    expect(result.split("\n").length).toBeGreaterThan(1);
+  });
 });
 
 describe("summarizeGrammar", () => {
@@ -331,5 +365,157 @@ describe("summarizeGrammar", () => {
       const summary = summarizeGrammar(parseResult.ast);
       expect(summary).toContain("active");
     }
+  });
+
+  it("should handle non-object nodes in describe function", () => {
+    // Test primitive values directly
+    const summary1 = summarizeGrammar("simple string");
+    expect(summary1).toBe("simple string");
+
+    const summary2 = summarizeGrammar(42);
+    expect(summary2).toBe("42");
+
+    const summary3 = summarizeGrammar(true);
+    expect(summary3).toBe("true");
+  });
+
+  it("should handle array nodes in describe function", () => {
+    const arrayNode = ["first", "second", "third"];
+    const summary = summarizeGrammar(arrayNode);
+    expect(summary).toBe("first, second, third");
+  });
+
+  it("should handle unknown node types", () => {
+    const unknownNode = {
+      type: "unknown_type",
+      customField: "test_value",
+      anotherField: 123,
+    };
+    const summary = summarizeGrammar(unknownNode);
+    expect(summary).toContain("customField: test_value");
+    expect(summary).toContain("anotherField: 123");
+  });
+
+  it("should handle unknown nodes with object properties", () => {
+    const unknownNode = {
+      type: "unknown_type",
+      objectProp: {
+        type: "comp",
+        field: "nested",
+        op: "=",
+        value: "test",
+      },
+    };
+    const summary = summarizeGrammar(unknownNode);
+    expect(summary).toContain("nested");
+    expect(summary).toContain("test");
+  });
+
+  it("should handle unknown nodes with only value property", () => {
+    const unknownNode = {
+      type: "unknown_type",
+      value: "direct_value",
+    };
+    const summary = summarizeGrammar(unknownNode);
+    expect(summary).toBe("direct_value");
+  });
+
+  it("should handle non-string field names", () => {
+    const nodeWithNumericField = {
+      type: "comp",
+      field: 123,
+      op: "=",
+      value: "test",
+    };
+    const summary = summarizeGrammar(nodeWithNumericField);
+    expect(summary).toContain("123");
+  });
+
+  it("should handle array values in formatValue", () => {
+    const nodeWithArrayValue = {
+      type: "comp",
+      field: "tags",
+      op: "=",
+      value: ["tag1", "tag2", "tag3"],
+    };
+    const summary = summarizeGrammar(nodeWithArrayValue);
+    expect(summary).toContain("[tag1, tag2, tag3]");
+  });
+
+  it("should handle nested arrays in formatValue", () => {
+    const nodeWithNestedArray = {
+      type: "comp",
+      field: "matrix",
+      op: "=",
+      value: [
+        ["a", "b"],
+        ["c", "d"],
+      ],
+    };
+    const summary = summarizeGrammar(nodeWithNestedArray);
+    expect(summary).toContain("[[a, b], [c, d]]");
+  });
+
+  it("should handle empty NOT expressions", () => {
+    const emptyNotNode = {
+      type: "not",
+      expr: null,
+    };
+    const summary = summarizeGrammar(emptyNotNode);
+    expect(summary).toBe("(empty not expression)");
+  });
+
+  it("should handle NOT expressions with empty string", () => {
+    const emptyNotNode = {
+      type: "not",
+      expr: "",
+    };
+    const summary = summarizeGrammar(emptyNotNode);
+    expect(summary).toBe("(empty not expression)");
+  });
+
+  it("should handle has operator (colon) in summarizeGrammar", () => {
+    // Create a mock AST node for has operator since we need to test the case
+    const hasNode = {
+      type: "has",
+      field: "tags",
+      value: "urgent",
+    };
+    const summary = summarizeGrammar(hasNode);
+    expect(summary).toBe("tags contains urgent");
+  });
+
+  it("should handle NOT with contains expression", () => {
+    const notContainsNode = {
+      type: "not",
+      expr: {
+        type: "has",
+        field: "tags",
+        value: "spam",
+      },
+    };
+    const summary = summarizeGrammar(notContainsNode);
+    expect(summary).toBe("tags does not contain spam");
+  });
+
+  it("should handle unknown nodes with empty meaningful properties", () => {
+    const emptyUnknownNode = {
+      type: "unknown_type",
+    };
+    const summary = summarizeGrammar(emptyUnknownNode);
+    expect(summary).toBe("");
+  });
+
+  it("should handle NOT with expressions that don't contain 'is' or 'contains'", () => {
+    // Create a NOT node with a child that doesn't have "is" or "contains" in its description
+    const notNode = {
+      type: "not",
+      expr: {
+        type: "unknown_type",
+        customField: "test_value",
+      },
+    };
+    const summary = summarizeGrammar(notNode);
+    expect(summary).toBe("not (customField: test_value)");
   });
 });
