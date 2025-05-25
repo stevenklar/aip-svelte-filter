@@ -1,5 +1,9 @@
 # AIP Svelte Filter - Google API Filter Parser (AIP-160)
 
+[![CI](https://github.com/stevenklar/aip-svelte-filter/actions/workflows/ci.yml/badge.svg)](https://github.com/stevenklar/aip-svelte-filter/actions/workflows/ci.yml)
+[![codecov](https://codecov.io/gh/stevenklar/aip-svelte-filter/branch/main/graph/badge.svg)](https://codecov.io/gh/stevenklar/aip-svelte-filter)
+[![npm version](https://badge.fury.io/js/aip-svelte-filter.svg)](https://badge.fury.io/js/aip-svelte-filter)
+
 A headless Svelte utility and parser for [Google API filter expressions](https://google.aip.dev/160), using a Peggy grammar. This module provides parsing, validation, and AST utilities for Google-style filter strings, suitable for use in Svelte apps or as a standalone JS utility.
 
 ## Features

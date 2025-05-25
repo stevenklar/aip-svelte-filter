@@ -3,4 +3,5 @@ dist/
 coverage/
 filter-peg.js
 *.min.js
-package-lock.json 
+package-lock.json
+.github/workflows/ 
