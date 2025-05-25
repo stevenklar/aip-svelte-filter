@@ -143,7 +143,5 @@ The project uses GitHub Actions for continuous integration:
 - **CI Pipeline**: Runs tests, linting, and builds on Node.js 18, 20, and 22
 - **Release Pipeline**: Automatically publishes to npm when a release is created
 - **Dependabot**: Automatically updates dependencies weekly
-
 ---
-
 MIT License.
