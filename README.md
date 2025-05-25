@@ -14,7 +14,7 @@ A headless Svelte utility and parser for [Google API filter expressions](https:/
 ```ts
 import { parse, prettyPrintAst, summarizeGrammar } from "./parser";
 
-const result = parse('policyGroup = "policyGroups/1234-1234-1234-1234"');
+const result = parse('post = "posts/1234-1234-1234-1234"');
 if (result.isSuccess) {
   console.log("AST:", result.ast);
   console.log("Pretty:", prettyPrintAst(result.ast));
@@ -29,7 +29,7 @@ if (result.isSuccess) {
 ```svelte
 <script lang="ts">
   import FilterParser from './FilterParser.svelte';
-  let filter = 'policyGroup = "policyGroups/1234-1234-1234-1234"';
+  let filter = 'post = "posts/1234-1234-1234-1234"';
 </script>
 
 <FilterParser {filter} let:ast let:isValid let:error let:prettyAst let:summary />

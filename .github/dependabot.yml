@@ -17,22 +17,22 @@ updates:
     groups:
       dev-dependencies:
         patterns:
+          - "@eslint/*"
+          - "@sveltejs/*"
           - "@types/*"
-          - "@testing-library/*"
+          - "@typescript-eslint/*"
           - "@vitest/*"
           - "eslint*"
+          - "globals"
+          - "peggy"
           - "prettier*"
+          - "svelte"
+          - "svelte-*"
           - "typescript*"
           - "vite*"
           - "vitest*"
         update-types:
           - "minor"
-          - "patch"
-      production-dependencies:
-        patterns:
-          - "svelte"
-          - "peggy"
-        update-types:
           - "patch"
 
   - package-ecosystem: "github-actions"
