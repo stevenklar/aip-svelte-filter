@@ -1,0 +1,58 @@
+// Google API Filter PEG.js Grammar (AIP-160)
+// This grammar parses filter expressions as described in https://google.aip.dev/160
+
+start
+  = _ expr:orExpr _ { return expr; }
+
+orExpr
+  = left:andExpr _ "OR"i _ right:orExpr { return { type: "or", left, right }; }
+  / andExpr
+
+andExpr
+  = left:notExpr _ "AND"i _ right:andExpr { return { type: "and", left, right }; }
+  / notExpr
+
+notExpr
+  = ("NOT"i / "-") _ expr:notExpr { return { type: "not", expr }; }
+  / compExpr
+
+compExpr
+  = field:fieldPath _ op:compOp _ value:value { return { type: "comp", field, op, value }; }
+  / field:fieldPath _ ":" _ value:value { return { type: "has", field, value }; }
+  / "(" _ expr:orExpr _ ")" { return expr; }
+  / value
+
+compOp
+  = "="  { return "="; }
+  / "!=" { return "!="; }
+  / "<=" { return "<="; }
+  / ">=" { return ">="; }
+  / "<"  { return "<"; }
+  / ">"  { return ">"; }
+
+fieldPath
+  = head:identifier tail:(_ "." _ identifier)* { return [head].concat(tail.map(t => t[3])).join("."); }
+
+value
+  = string
+  / number
+  / boolean
+  / identifier
+
+string
+  = '"' chars:([^"\\] / '\\"')* '"' { return chars.join(""); }
+
+number
+  = digits:[0-9]+ frac:('.' [0-9]+)? exp:([eE][+-]?[0-9]+)? {
+      return parseFloat(text());
+    }
+
+boolean
+  = "true"i { return true; }
+  / "false"i { return false; }
+
+identifier
+  = $([a-zA-Z_][a-zA-Z0-9_]*) { return text(); }
+
+_ "whitespace"
+  = [ \t\n\r]* 

@@ -1,0 +1,6 @@
+node_modules/
+dist/
+coverage/
+filter-peg.js
+*.min.js
+package-lock.json 
