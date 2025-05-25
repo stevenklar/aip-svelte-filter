@@ -1,0 +1,92 @@
+name: Autofix
+
+on:
+  pull_request:
+    types: [opened, synchronize, reopened]
+
+jobs:
+  autofix:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+      issues: write
+      pull-requests: write
+      id-token: write
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+          token: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: "npm"
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Build grammar (required for some formatting)
+        run: npm run build:grammar
+
+      - name: Run formatter
+        run: npm run format
+
+      - name: Run ESLint autofix
+        run: npm run format-eslint
+
+      - name: Check for changes
+        id: changes
+        run: |
+          if [ -n "$(git status --porcelain)" ]; then
+            echo "changes=true" >> $GITHUB_OUTPUT
+            echo "📝 Found formatting changes that will be auto-committed"
+          else
+            echo "changes=false" >> $GITHUB_OUTPUT
+            echo "✅ No formatting changes needed"
+          fi
+
+      - name: Commit and push changes
+        if: steps.changes.outputs.changes == 'true'
+        run: |
+          git config --local user.email "action@github.com"
+          git config --local user.name "GitHub Action"
+          git add .
+          git commit -m "style: auto-format code with prettier and eslint
+
+          Co-authored-by: ${{ github.actor }} <${{ github.actor }}@users.noreply.github.com>"
+          git push
+
+      - name: Comment on PR
+        if: steps.changes.outputs.changes == 'true'
+        uses: actions/github-script@v7
+        with:
+          script: |
+            github.rest.issues.createComment({
+              issue_number: context.issue.number,
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              body: '🤖 **Auto-formatted your code!**\n\nI found some formatting issues and fixed them automatically. The latest commit includes these formatting changes:\n\n- ✨ Prettier formatting\n- 🔧 ESLint auto-fixes\n\nYour tests should now pass! 🎉'
+            })
+
+      - name: Summary
+        run: |
+          if [ "${{ steps.changes.outputs.changes }}" == "true" ]; then
+            echo "🤖 **Auto-fix Summary**" >> $GITHUB_STEP_SUMMARY
+            echo "====================" >> $GITHUB_STEP_SUMMARY
+            echo "" >> $GITHUB_STEP_SUMMARY
+            echo "✅ **Formatting issues found and fixed!**" >> $GITHUB_STEP_SUMMARY
+            echo "" >> $GITHUB_STEP_SUMMARY
+            echo "The following tools were run:" >> $GITHUB_STEP_SUMMARY
+            echo "- 🎨 Prettier (code formatting)" >> $GITHUB_STEP_SUMMARY
+            echo "- 🔧 ESLint (auto-fixable issues)" >> $GITHUB_STEP_SUMMARY
+            echo "" >> $GITHUB_STEP_SUMMARY
+            echo "Changes have been committed and pushed to this PR." >> $GITHUB_STEP_SUMMARY
+          else
+            echo "✅ **No formatting changes needed!**" >> $GITHUB_STEP_SUMMARY
+            echo "" >> $GITHUB_STEP_SUMMARY
+            echo "Your code is already properly formatted. 🎉" >> $GITHUB_STEP_SUMMARY
+          fi 
