@@ -11,7 +11,7 @@ jobs:
   release:
     runs-on: ubuntu-latest
     if: ${{ github.event.workflow_run.conclusion == 'success' }}
-    
+
     permissions:
       contents: write
       issues: write
@@ -64,10 +64,10 @@ jobs:
           else
             COMMITS=$(git log ${LAST_TAG}..HEAD --oneline)
           fi
-          
+
           echo "Recent commits:"
           echo "$COMMITS"
-          
+
           # Determine bump type based on commit messages
           if echo "$COMMITS" | grep -qiE "(BREAKING CHANGE|breaking:|\!:)"; then
             echo "BUMP_TYPE=major" >> $GITHUB_OUTPUT
@@ -86,7 +86,7 @@ jobs:
         run: |
           BUMP_TYPE="${{ steps.version-bump.outputs.BUMP_TYPE }}"
           echo "Bumping $BUMP_TYPE version..."
-          
+
           NEW_VERSION=$(npm version $BUMP_TYPE --no-git-tag-version)
           echo "NEW_VERSION=$NEW_VERSION" >> $GITHUB_OUTPUT
           echo "New version: $NEW_VERSION"
@@ -96,7 +96,7 @@ jobs:
         id: changelog
         run: |
           NEW_VERSION="${{ steps.bump.outputs.NEW_VERSION }}"
-          
+
           # Get commits since last tag for changelog
           LAST_TAG=$(git describe --tags --abbrev=0 2>/dev/null || echo "")
           if [ -z "$LAST_TAG" ]; then
@@ -104,7 +104,7 @@ jobs:
           else
             COMMITS=$(git log ${LAST_TAG}..HEAD --oneline --pretty=format:"- %s (%h)")
           fi
-          
+
           # Create changelog content
           {
             echo "CHANGELOG<<EOF"
@@ -134,7 +134,7 @@ jobs:
             const { owner, repo } = context.repo;
             const tagName = "${{ steps.bump.outputs.NEW_VERSION }}";
             const changelog = `${{ steps.changelog.outputs.CHANGELOG }}`;
-            
+
             await github.rest.repos.createRelease({
               owner,
               repo,
@@ -143,4 +143,4 @@ jobs:
               body: changelog,
               draft: false,
               prerelease: false
-            }); 
+            });

@@ -18,15 +18,10 @@
     "outDir": "./dist",
     "baseUrl": ".",
     "paths": {
-      "aip-svelte-filter": [
-        "./src/lib/index.ts"
-      ]
+      "aip-svelte-filter": ["./src/lib/index.ts"]
     }
   },
-  "include": [
-    "src/**/*.ts",
-    "src/**/*.svelte"
-  ],
+  "include": ["src/**/*.ts", "src/**/*.svelte"],
   "exclude": [
     "dist",
     "node_modules",
