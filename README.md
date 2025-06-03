@@ -16,8 +16,10 @@ A headless Svelte utility and parser for [Google API filter expressions](https:/
 
 ## Usage (JS/TS)
 
+Import the parser utilities from the package:
+
 ```ts
-import { parse, prettyPrintAst, summarizeGrammar } from "./parser";
+import { parse, prettyPrintAst, summarizeGrammar } from "aip-svelte-filter";
 
 const result = parse('post = "posts/1234-1234-1234-1234"');
 if (result.isSuccess) {
