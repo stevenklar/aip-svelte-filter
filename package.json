@@ -1,6 +1,6 @@
 {
   "name": "aip-svelte-filter",
-  "version": "1.0.30",
+  "version": "1.0.31",
   "description": "A headless Svelte utility and parser for Google API filter expressions (AIP-160), using a Peggy grammar",
   "type": "module",
   "main": "dist/index.js",
