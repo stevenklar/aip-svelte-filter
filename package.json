@@ -61,7 +61,7 @@
     "eslint": "^9.0.0",
     "eslint-config-prettier": "^10.1.8",
     "eslint-plugin-svelte": "^3.9.1",
-    "globals": "^16.2.0",
+    "globals": "^17.3.0",
     "peggy": "^5.0.3",
     "prettier": "^3.1.0",
     "prettier-plugin-svelte": "^3.1.0",
