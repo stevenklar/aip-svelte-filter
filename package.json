@@ -58,7 +58,7 @@
     "@typescript-eslint/eslint-plugin": "^8.0.0",
     "@typescript-eslint/parser": "^8.0.0",
     "@vitest/coverage-v8": "^3.1.4",
-    "eslint": "^9.0.0",
+    "eslint": "^10.0.0",
     "eslint-config-prettier": "^10.1.8",
     "eslint-plugin-svelte": "^3.9.1",
     "globals": "^17.3.0",
